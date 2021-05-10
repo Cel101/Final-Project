@@ -22,12 +22,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import java.awt.Desktop;
+import java.net.URI;
+import java.net.URISyntaxException;
 public class BattleGenerator {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         
         
         //Variables
@@ -37,6 +40,8 @@ public class BattleGenerator {
         String realmChoice = "";
         int pointsChoice = 0;
         ArrayList<String> nighthaunt = new ArrayList<String>();
+        Desktop d = Desktop.getDesktop();
+        int unitMenu = 0;
         
         
         //Biome Arrays
@@ -126,24 +131,74 @@ public class BattleGenerator {
         nighthauntUnits.add(nighthaunt.get(23));
         nighthauntUnits.add(nighthaunt.get(24));
         nighthauntUnits.add(nighthaunt.get(26));
+        
+        ArrayList<String> playerLords = new ArrayList<String>();
         //End Datastore Manipulation
         
         //Menu Loop
-        while (menuChoice != 5){
+        while (menuChoice != 10){
             menu();
             menuChoice = input.nextInt();
-            if (menuChoice > 5 || menuChoice < 1){
-                System.out.println("Option not available: Please choose betweeen 1 and 5");
+            if (menuChoice > 10 || menuChoice < 1){     //OPTION !
+                System.out.println("Option not available: Please choose betweeen 1 and 10");
             }
-            else if (menuChoice == 1){
+            else if (menuChoice == 1){                  //OPTION 1
                 realmChoice = realms[realmMenu()].getRealmName();
                 System.out.println(realmChoice);
                 
             }
-            else if (menuChoice == 2){
+            else if (menuChoice == 2){                  //OPTION 2
                 pointsChoice = pointsMenu();
             }
-            else if (menuChoice == 3){
+            else if (menuChoice == 3){                  //OPTION 3
+                rollingChoice = 0;
+                
+                while (rollingChoice != 2){
+                    System.out.println("Choose from the following");
+                    System.out.println("1.) Add Available Lord Models");
+                    System.out.println("2.) Back to Main Menu");
+                    rollingChoice = input.nextInt();
+                    if (rollingChoice < 0 || rollingChoice > 2){
+                        System.out.println("You must choose either 1 or 2");
+                    }
+                    else if (rollingChoice == 1){
+                        System.out.println("Select a Lord model to add: ");
+                        System.out.println("1.)" +nighthauntLords.get(0));
+                        System.out.println("2.)" +nighthauntLords.get(1));
+                        System.out.println("3.)" +nighthauntLords.get(2));
+                        System.out.println("4.)" +nighthauntLords.get(3));
+                        System.out.println("5.)" +nighthauntLords.get(4));
+                        System.out.println("6.)" +nighthauntLords.get(5));
+                        unitMenu = input.nextInt();
+                        if (unitMenu < 0 || unitMenu > 6){
+                            System.out.println("You can only choose an option from 1 to 6");
+                        }
+                        else if(unitMenu == 1){
+                            playerLords.add(nighthauntLords.get(0));
+                        }
+                        else if(unitMenu == 2){
+                            playerLords.add(nighthauntLords.get(1));
+                        }
+                        else if(unitMenu == 3){
+                            playerLords.add(nighthauntLords.get(2));
+                        }
+                        else if(unitMenu == 4){
+                            playerLords.add(nighthauntLords.get(3));
+                        }
+                        else if(unitMenu == 5){
+                            playerLords.add(nighthauntLords.get(4));
+                        }
+                        else if(unitMenu == 6){
+                            playerLords.add(nighthauntLords.get(5));
+                        }
+                    }
+                    else if (rollingChoice == 2){
+                        System.out.println("Returning to Main Menu");
+                    }
+                }
+                
+            }//End menu 3
+            else if (menuChoice == 4){                  //Option 4 See Campaign Info
                 if (realmChoice == ""){
                     System.out.println("No realm has been chosen");
                 }
@@ -156,8 +211,13 @@ public class BattleGenerator {
                 else {
                     System.out.println("Points: " +pointsChoice);
                 }
-            }//End menu 3
-            else if (menuChoice == 4){
+                
+            }
+            else if (menuChoice == 5){          //Option 5 See Character Sheet
+                characterSheet();
+                
+            }//End Menu 5
+            else if (menuChoice == 6){          //Option 6 Generate Battleplan
                 if (realmChoice == ""){
                     System.out.println("No realm has been chosen. Please select option 1 from the main menu and set the realm");
                 }
@@ -172,12 +232,38 @@ public class BattleGenerator {
                     System.out.println("Battle will be played at " +pointsChoice);
                     System.out.println("Models will be placed on the table using " +deploy[rollD6()]);
                 }
+                
+            }//End Menu 6
+            else if (menuChoice == 7){          //OPTION 7 Roll Dice
+                System.out.println("How many dice would you like to roll? ");
+                rollingChoice = input.nextInt();
+                System.out.println("RESULTS:");
+                for (int i = 0; i < rollingChoice; ++i){
+                    System.out.println(rollD6()+1);
+                }
+                
             }
-            else if (menuChoice == 5){
+            else if (menuChoice == 8){          //OPTION 8 See Rules
+                try {
+                    d.browse(new URI("https://ageofsigmar.com/wp-content/uploads/sites/12/2018/06/AoS_Rules-ENG.pdf"));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(BattleGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+            else if (menuChoice == 9){          //OPTION 9 Visit GW
+                try {
+                    d.browse(new URI("https://www.games-workshop.com/en-US/Warhammer-Age-of-Sigmar"));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(BattleGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+            else if (menuChoice == 10){
                 System.out.println("Thanks for playing!");
             }
             
-        }
+        }//End Menu Loop
         
     }//End Main
     
@@ -185,9 +271,14 @@ public class BattleGenerator {
         System.out.println("Main Menu");
         System.out.println("1.) Set Realm Location");
         System.out.println("2.) Set Points Value");
-        System.out.println("3.) See Campaign Info");
-        System.out.println("4.) Generate Battleplan");
-        System.out.println("5.) Exit Program");
+        System.out.println("3.) Set Available Models");
+        System.out.println("4.) See Campaign Info");
+        System.out.println("5.) See Character Sheet");
+        System.out.println("6.) Generate Battleplan");
+        System.out.println("7.) Roll Dice");
+        System.out.println("8.) See Game Rules");
+        System.out.println("9.) Visit Games Workshop");
+        System.out.println("10.) Exit Program");
     }//End Menu Method
     
     public static int realmMenu(){
@@ -235,5 +326,55 @@ public class BattleGenerator {
         int result = 0;
         result = (int)(Math.random() * 6) +1;
         return result -1;
+    }
+    public static void characterSheet() throws IOException{
+        Scanner input = new Scanner(System.in);
+        Desktop d = Desktop.getDesktop();
+        int choice = 0;
+        System.out.println("Select Character Sheet to view: ");
+        System.out.println("1.) Stormcast Eternals: Gardus Steelsoul");
+        System.out.println("2.) Lumineth Realm-Lords: Scinari Cathallar");
+        System.out.println("3.) Sylvaneth: Druanti the Arch-Revenant");
+        System.out.println("4.) Fyreslayers: Grimwrath Berzerker");
+        System.out.println("5.) Seraphon: Skink Starpriest");
+        choice = input.nextInt();
+        if (choice < 1 || choice > 5){
+            System.out.println("You must choose between 1 and 5. Returning to main menu");
+        }
+        else if (choice == 1){
+            try {
+                    d.browse(new URI("https://www.games-workshop.com/resources/PDF/AoS_Warscrolls/BR_Belakor_Warscroll_GardusSteelSoul_eng.pdf"));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(BattleGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+        else if (choice == 2){
+            try {
+                    d.browse(new URI("https://www.games-workshop.com/resources/PDF/AoS_Warscrolls/Lumineth_Warscroll_Scinari%20Cathallar%20-%20eng.pdf"));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(BattleGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+        else if (choice == 3){
+            try {
+                    d.browse(new URI("https://www.games-workshop.com/resources/PDF/AoS_Warscrolls/AoS_Arch_Revenant_ENG.pdf"));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(BattleGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+        else if (choice == 4){
+            try {
+                    d.browse(new URI("https://www.games-workshop.com/resources/PDF/AoS_Warscrolls/BR_Belakor_Warscroll_GrimwrathBerzerker_eng.pdf"));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(BattleGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+        else if (choice == 5){
+            try {
+                    d.browse(new URI("https://www.games-workshop.com/resources/PDF/AoS_Warscrolls/Seraphon_warscroll_Skink-Starpriest-en.pdf"));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(BattleGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
     }
 }//End Class
